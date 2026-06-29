@@ -9,4 +9,6 @@ public class AuthRequest {
     private String username;
     @NotBlank(message = "Password es obligatorio")
     private String password;
+    @NotBlank(message = "Email es obligatorio")
+    private String email;
 }
