@@ -1,6 +1,7 @@
 package com.ordersystem.order_management.config;
 
 import com.ordersystem.order_management.security.CustomUserDetailsService;
+import com.ordersystem.order_management.security.JwtAuthenticationEntryPoint;
 import com.ordersystem.order_management.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -25,12 +26,17 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Autowired
+    private JwtAuthenticationEntryPoint unauthorizedHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(unauthorizedHandler)
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()  // Registro y login públicos
                         .requestMatchers("/api/products/**").authenticated()  // Productos requieren autenticación
