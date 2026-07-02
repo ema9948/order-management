@@ -38,9 +38,9 @@ public class SecurityConfig {
                         .authenticationEntryPoint(unauthorizedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()  // Registro y login públicos
-                        .requestMatchers("/api/products/**").authenticated()  // Productos requieren autenticación
-                        .requestMatchers("/api/orders/**").authenticated()   // Pedidos requieren autenticación
+                        .requestMatchers("/api/auth/**","/swagger-ui/**","/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/api/products/**").authenticated()
+                        .requestMatchers("/api/orders/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
