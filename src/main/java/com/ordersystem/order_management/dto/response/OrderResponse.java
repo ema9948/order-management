@@ -1,4 +1,5 @@
 package com.ordersystem.order_management.dto.response;
+import com.ordersystem.order_management.model.entity.enums.OrderStatus;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,7 +9,7 @@ import java.util.List;
 public class OrderResponse {
     private Long id;
     private LocalDateTime orderDate;
-    private String status;
+    private OrderStatus status;
     private BigDecimal totalAmount;
     private UserResponse user;
     private List<OrderItemResponse> items;

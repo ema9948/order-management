@@ -7,6 +7,7 @@ import com.ordersystem.order_management.model.entity.Order;
 import com.ordersystem.order_management.model.entity.OrderItem;
 import com.ordersystem.order_management.model.entity.Product;
 import com.ordersystem.order_management.model.entity.User;
+import com.ordersystem.order_management.model.entity.enums.OrderStatus;
 import com.ordersystem.order_management.repository.OrderRepository;
 import com.ordersystem.order_management.repository.ProductRepository;
 import com.ordersystem.order_management.repository.UserRepository;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,7 +44,7 @@ public class OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setOrderDate(LocalDateTime.now());
-        order.setStatus("PENDING");
+        order.setStatus(OrderStatus.PENDING);
 
         BigDecimal total = BigDecimal.ZERO;
 
@@ -116,7 +118,7 @@ public class OrderService {
             throw new RuntimeException("No tienes permiso para cancelar este pedido");
         }
 
-        if (!order.getStatus().equals("PENDING")) {
+        if (!order.getStatus().equals(OrderStatus.PENDING)) {
             throw new RuntimeException("Solo se pueden cancelar pedidos en estado PENDING");
         }
 
@@ -126,7 +128,7 @@ public class OrderService {
             productRepository.save(product);
         }
 
-        order.setStatus("CANCELLED");
+        order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
     }
 
@@ -158,5 +160,25 @@ public class OrderService {
         response.setItems(itemResponses);
 
         return response;
+    }
+    public List<OrderResponse> getAllOrders() {
+        return orderRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+
+        if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) {
+            throw new RuntimeException("No se puede cambiar el estado de un pedido " + order.getStatus());
+        }
+
+        order.setStatus(newStatus);
+        Order updated = orderRepository.save(order);
+        return mapToResponse(updated);
     }
 }

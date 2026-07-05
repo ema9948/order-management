@@ -2,11 +2,13 @@ package com.ordersystem.order_management.controller;
 
 import com.ordersystem.order_management.dto.request.OrderRequest;
 import com.ordersystem.order_management.dto.response.OrderResponse;
+import com.ordersystem.order_management.model.entity.enums.OrderStatus;
 import com.ordersystem.order_management.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,5 +42,21 @@ public class OrderController {
     public ResponseEntity<Void> cancelOrder(@PathVariable Long id) {
         orderService.cancelOrder(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/admin/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<OrderResponse>> getAllOrders() {
+        List<OrderResponse> orders = orderService.getAllOrders();  // Nuevo método en servicio
+        return ResponseEntity.ok(orders);
+    }
+
+    @PutMapping("/admin/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<OrderResponse> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestParam OrderStatus status) {  // Spring convierte automáticamente el string al enum
+        OrderResponse updated = orderService.updateOrderStatus(id, status);
+        return ResponseEntity.ok(updated);
     }
 }
