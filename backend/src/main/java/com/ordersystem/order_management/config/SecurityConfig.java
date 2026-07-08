@@ -57,16 +57,15 @@ public class SecurityConfig {
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
+        config.addAllowedOrigin("http://localhost:4200"); //? port angular
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-
-        source.registerCorsConfiguration("/v3/api-docs", config);
+        source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
